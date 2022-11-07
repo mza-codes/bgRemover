@@ -1,0 +1,83 @@
+/* FullPage */
+.home {
+    min-height: 100vh;
+}
+
+/* Header */
+.titleContainer {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+}
+
+.appTitle {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.author {
+    position: absolute;
+    bottom: 16px;
+    right: 41%;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* MainBody */
+.mainWrapper {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 12px;
+}
+
+.imgContainer {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1;
+}
+
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    color: #fff;
+}
+
+.inputContainer label{
+    background: linear-gradient(to right, #df75fa,#62e6e6);
+    color: #000;
+    border-radius: 14px 4px 14px 4px;
+    padding: 8px;
+    transition: all 600ms;
+}
+
+.inputContainer label:hover{
+    background: linear-gradient(to right, #44f1da,#8e3aee);
+    border-radius: 4px 14px 4px 14px;
+}
+
+.resultContainer {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1;
+}
+
+.image {
+    border-radius: 2px;
+    max-width: 480px;
+    max-height: 80vh;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.imgInfo{
+    gap: -4px !important;
+}
