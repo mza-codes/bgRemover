@@ -3,10 +3,8 @@ import './app.css';
 
 const App = () => {
     return (
-        <div>
-            <Home />
-        </div>
-    )
-}
+        <Home />
+    );
+};
 
-export default App
+export default App;

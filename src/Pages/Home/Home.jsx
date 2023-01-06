@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { fetchImage } from '../../Api';
+import Loader from '../../Components/Loader/Loader';
 import './home.css';
 
+let controller;
 const Home = () => {
     const [image, setImage] = useState("");
     const [image2, setImage2] = useState("");
@@ -10,22 +11,6 @@ const Home = () => {
     const [blob, setblob] = useState({});
     const [validImg, setValidImg] = useState(false);
     const [err, setErr] = useState();
-
-    const [base64, setBase64] = useState(null);
-
-    // Conversion to Base64 for future Development
-    const blobToBase64 = async blob => {
-        return new Promise(async (resolve, reject) => {
-            let base64data;
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = function () {
-                base64data = reader.result;
-                resolve(base64data);
-            };
-            reader.error = (err) => { setErr(err); reject(err) };
-        });
-    };
 
     const handleImageUpload = async (file) => {
         console.log(file?.type);
@@ -35,14 +20,12 @@ const Home = () => {
         setLoading(true);
         setImage(URL.createObjectURL(file));
         setblob(file);
-        const imageBase64 = await blobToBase64(file);
-        setBase64(imageBase64);
         setLoading(false);
     };
 
+    // bg.remove api needs access key
     const handleTask = async () => {
         setLoading(true);
-        // Adding to FormData
         const formD = new FormData();
         formD.append('size', 'auto');
         formD.append('image_file', blob);
@@ -58,7 +41,6 @@ const Home = () => {
         }).then((res) => {
             const arrayBufferView = new Uint8Array(res.data);
             const blob = new Blob([arrayBufferView], { type: "image/png" });
-            // const blob = new Blob([arrayBufferView]);
             console.log("server fetched blob", blob);
             setImage2(URL.createObjectURL(blob));
             console.log('COMPLETED');
@@ -71,22 +53,40 @@ const Home = () => {
     }
 
     const handleApiReq = async () => {
-        const controller = new AbortController();
-        const data = await fetchImage(base64,controller.signal);
-        console.log(data);
-        return;
+        controller?.abort();
+        setLoading(true);
+        controller = new AbortController();
+        const formData = new FormData();
+        formData.append("image", blob);
+        try {
+            const { data } = await axios.post(
+                'http://localhost:8000/populate ', formData, {
+                signal: controller.signal,
+                timeout: (120 * 1000)
+            });
+            console.log(data);
+            setImage2(`http://${data}`);
+        } catch (err) {
+            console.warn("ERROR Occured");
+            console.log(err);
+            setErr(err);
+        } finally {
+            setLoading(false);
+            return;
+        };
     };
 
     return (
-        <div className='home'>
+        <main className='home'>
             <div className="titleContainer">
                 <p className='appTitle wiggleFont'>Image BG Remover<span className='author'>-mza</span></p>
             </div>
-            <div className="mainWrapper">
+            <section className="mainWrapper">
                 <div className="imgContainer">
                     <h3>Input Image</h3>
                     {image && <img className='image' id='photo' src={image} alt="_load_image" />}
                 </div>
+
                 <div className="inputContainer">
                     <label htmlFor="image" className='pointer'>Select Image</label>
                     <input id='image' hidden type="file" accept='image/*'
@@ -96,21 +96,23 @@ const Home = () => {
                         <p>{blob?.type}</p>
                         {blob?.size && <p>{parseInt(blob?.size) * 1e-6 + "MB"}</p>}
                     </div>
-                    {validImg && <div className="submitArea">
-                        {loading ? <h6>Loading...</h6> :
-                            <button type='button' onClick={handleTask}> Submit </button>}
-                        <p>{err?.message}</p>
-                    </div>}
+
+                    {loading && <Loader />}
+
+                    {validImg &&
+                        <div className="submitArea">
+                            <button type='button' onClick={handleApiReq} disabled={loading}> Submit </button>
+                            <p>{err?.message}</p>
+                        </div>
+                    }
+
                 </div>
                 <div className="imgContainer">
                     <h3>Result Image</h3>
                     {image2 && <img className='image' src={image2} alt="_load_image" />}
                 </div>
-                {/* <div className="resultContainer">
-
-                </div> */}
-            </div>
-        </div>
+            </section>
+        </main>
     )
 }
 
