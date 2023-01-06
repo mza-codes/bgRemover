@@ -1,4 +1,4 @@
-import Home from "./Pages/HomePage.jsx/Home";
+import Home from "./Pages/Home/Home";
 import './app.css';
 
 const App = () => {

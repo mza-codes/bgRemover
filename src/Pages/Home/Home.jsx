@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
+import { fetchImage } from '../../Api';
 import './home.css';
 
 const Home = () => {
@@ -9,6 +10,8 @@ const Home = () => {
     const [blob, setblob] = useState({});
     const [validImg, setValidImg] = useState(false);
     const [err, setErr] = useState();
+
+    const [base64, setBase64] = useState(null);
 
     // Conversion to Base64 for future Development
     const blobToBase64 = async blob => {
@@ -33,6 +36,7 @@ const Home = () => {
         setImage(URL.createObjectURL(file));
         setblob(file);
         const imageBase64 = await blobToBase64(file);
+        setBase64(imageBase64);
         setLoading(false);
     };
 
@@ -65,6 +69,13 @@ const Home = () => {
             setLoading(false);
         });
     }
+
+    const handleApiReq = async () => {
+        const controller = new AbortController();
+        const data = await fetchImage(base64,controller.signal);
+        console.log(data);
+        return;
+    };
 
     return (
         <div className='home'>
